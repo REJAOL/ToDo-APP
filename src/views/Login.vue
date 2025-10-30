@@ -12,6 +12,11 @@ const isLogin = ref(true)
 const router = useRouter()
 
 async function handleAuth() {
+
+    console.log('Email:', email.value)
+  console.log('Password:', password.value)
+  console.log('Is Login:', isLogin.value)
+
   error.value = ''
   try {
     let user
