@@ -1,33 +1,43 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth'
 import { doc, setDoc } from 'firebase/firestore'
 import { auth, db } from '../firebase'
 
 const email = ref('')
 const password = ref('')
 const error = ref('')
+const isLogin = ref(true)  // লগইন মোড
 const router = useRouter()
 
-async function login() {
+// একটা ফাংশন দিয়ে লগইন + রেজিস্টার
+async function handleAuth() {
   error.value = ''
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
-    const user = userCredential.user
+    let user
 
-    // নতুন: users/{uid} এ email সেভ করো
+    if (isLogin.value) {
+      // লগইন
+      const cred = await signInWithEmailAndPassword(auth, email.value, password.value)
+      user = cred.user
+    } else {
+      // রেজিস্টার
+      const cred = await createUserWithEmailAndPassword(auth, email.value, password.value)
+      user = cred.user
+    }
+
+    // লগইন বা রেজিস্টার যাই হোক — users/{uid} এ email সেভ করো
     await setDoc(doc(db, 'users', user.uid), {
       email: user.email
     }, { merge: true })
 
     router.push('/')
   } catch (err) {
-    error.value = 'Login failed: ' + err.message
+    error.value = err.message
   }
 }
 </script>
-
 
 <template>
   <div class="container mt-5">
@@ -41,7 +51,7 @@ async function login() {
         </button>
         <p class="text-center mt-3">
           <a href="#" @click.prevent="isLogin = !isLogin">
-            {{ isLogin ? 'Need account?' : 'Have account?' }}
+            {{ isLogin ? 'Need account? Register' : 'Have account? Login' }}
           </a>
         </p>
         <p v-if="error" class="text-danger text-center">{{ error }}</p>
