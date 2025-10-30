@@ -8,10 +8,9 @@ import { auth, db } from '../firebase'
 const email = ref('')
 const password = ref('')
 const error = ref('')
-const isLogin = ref(true)  // লগইন মোড
+const isLogin = ref(true)
 const router = useRouter()
 
-// একটা ফাংশন দিয়ে লগইন + রেজিস্টার
 async function handleAuth() {
   error.value = ''
   try {
@@ -27,14 +26,17 @@ async function handleAuth() {
       user = cred.user
     }
 
-    // লগইন বা রেজিস্টার যাই হোক — users/{uid} এ email সেভ করো
+    // এই লাইনটা চলতেই হবে
     await setDoc(doc(db, 'users', user.uid), {
       email: user.email
     }, { merge: true })
 
+    console.log('Saved to Firestore:', user.email, user.uid) // ডিবাগ
+
     router.push('/')
   } catch (err) {
     error.value = err.message
+    console.error('Auth error:', err)
   }
 }
 </script>
