@@ -27,33 +27,40 @@ import UserCard from '../components/UserCard.vue'
 import Navbar from '../components/Navbar.vue'
 
 const currentUserEmail = ref('')
+const allTasks = ref([])
 
-// সব ইউজারের সব টাস্ক (subcollection থেকে)
-const allTasksQuery = query(collectionGroup(db, 'tasks'))
-const allTasksData = useCollection(allTasksQuery)
-const allTasks = computed(() => allTasksData.value || [])
-
-// ইউজার অনুযায়ী গ্রুপ
-const userTaskGroups = computed(() => {
-  const groups = {}
-  allTasks.value.forEach(task => {
-    const email = task.createdBy || 'Unknown User'
-    if (!groups[email]) {
-      groups[email] = { email, tasks: [] }
-    }
-    groups[email].tasks.push(task)
-  })
-  return Object.values(groups).sort((a, b) => a.email.localeCompare(b.email))
-})
+// 
+const tasksQuery = query(collectionGroup(db, 'tasks'))
+const tasksData = useCollection(tasksQuery)
 
 onMounted(() => {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       currentUserEmail.value = user.email
-    } else {
-      currentUserEmail.value = ''
     }
   })
+})
+
+// 
+const userTaskGroups = computed(() => {
+  const groups = {}
+
+  //
+  tasksData.value.forEach(task => {
+    const email = task.createdBy || 'Unknown'
+    if (!groups[email]) groups[email] = { email, tasks: [] }
+    groups[email].tasks.push(task)
+  })
+
+  // 
+  if (currentUserEmail.value && !groups[currentUserEmail.value]) {
+    groups[currentUserEmail.value] = { 
+      email: currentUserEmail.value, 
+      tasks: [] 
+    }
+  }
+
+  return Object.values(groups).sort((a, b) => a.email.localeCompare(b.email))
 })
 </script>
 

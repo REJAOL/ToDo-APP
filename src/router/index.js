@@ -1,26 +1,29 @@
 // src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router'
-import Login from '../views/Login.vue'
-import Home from '../views/Home.vue'
-import { getAuth } from 'firebase/auth'  // <-- এটা
-import { app } from '../firebase'       // <-- app import
+import { getAuth } from 'firebase/auth'
+import { app } from '../firebase'
 
-const auth = getAuth(app)  // <-- নতুন করে তৈরি করো
+const auth = getAuth(app)
 
 const routes = [
-  { path: '/',
-    name:'AllUsers',
-    component : ()=> import('../views/AllUsersView.vue'),
-    meta:{requiresAuth:true}
-   },
-  { path: '/login', 
-    name:'Login',
-    component: ()=>import('../views/Login.vue') 
+  { 
+    path: '/',
+    name: 'AllUsers',
+    component: () => import('../views/AllUsersView.vue'),
+    meta: { requiresAuth: true }
   },
-  { path: '/home', 
-    name: Home, 
-    component:()=>import('../views/Home.vue'),
-    meta: { requiresAuth: true } }
+  { 
+    path: '/login', 
+    name: 'Login',
+    component: () => import('../views/Login.vue') 
+  },
+  { 
+    path: '/home', 
+    name: 'Home', 
+    component: () => import('../views/Home.vue'),
+    meta: { requiresAuth: true } 
+  },
+  { path: '/:pathMatch(.*)*', redirect: '/login' }
 ]
 
 const router = createRouter({
@@ -36,7 +39,7 @@ router.beforeEach((to, from, next) => {
     if (requiresAuth && !user) {
       next('/login')
     } else if (to.path === '/login' && user) {
-      next('/')
+      next('/') 
     } else {
       next()
     }

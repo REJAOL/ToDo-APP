@@ -1,4 +1,3 @@
-<!-- components/UserCard.vue -->
 <template>
   <div 
     class="card h-100 shadow-sm border-0 rounded-4 user-card"
@@ -49,7 +48,6 @@ const props = defineProps({
 })
 
 const router = useRouter()
-
 const isCurrentUser = computed(() => props.userEmail === props.currentUserEmail)
 
 const userTasks = computed(() => 
@@ -57,6 +55,7 @@ const userTasks = computed(() =>
     .filter(t => t.createdBy === props.userEmail)
     .slice(0, 5)
 )
+
 function goToHome() {
   if (isCurrentUser.value) {
     router.push('/home')
@@ -69,14 +68,10 @@ function formatDate(date) {
 </script>
 
 <style scoped>
-.user-card {
-  transition: all 0.3s ease;
-}
+.user-card { transition: all 0.3s ease; }
 .user-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
 }
-.clickable {
-  cursor: pointer;
-}
+.clickable { cursor: pointer; }
 </style>

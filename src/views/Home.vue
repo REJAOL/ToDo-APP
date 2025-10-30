@@ -50,6 +50,7 @@ const completedCount = computed(() => tasks.value.filter(t => t.completed).lengt
 
 // === 4. Functions ===
 
+// addTask() ফাংশন
 async function addTask() {
   const text = newTaskText.value.trim()
   if (text && auth.currentUser) {
@@ -59,7 +60,7 @@ async function addTask() {
       isEditing: false,
       dueDate: newDueDate.value,
       remind: newRemind.value,
-      createdBy: auth.currentUser.email
+      createdBy: auth.currentUser.email 
     })
     newTaskText.value = ''
     newDueDate.value = ''
