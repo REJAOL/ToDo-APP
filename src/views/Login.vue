@@ -1,29 +1,31 @@
 <script setup>
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { auth } from '../firebase';
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { doc, setDoc } from 'firebase/firestore'
+import { auth, db } from '../firebase'
 
-const router = useRouter()
 const email = ref('')
 const password = ref('')
-const isLogin =ref(true)
-const error =ref('')
+const error = ref('')
+const router = useRouter()
 
-async function handleAuth(){
-    try {
-        if(isLogin.value){
-            await signInWithEmailAndPassword(auth,email.value,password.value)
+async function login() {
+  error.value = ''
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
+    const user = userCredential.user
 
-        }else{
-            await createUserWithEmailAndPassword(auth, email.value, password.value)
-        }
-        router.push('/')
-    } catch (err) {
-        error.value = err.message
-    }
+    // নতুন: users/{uid} এ email সেভ করো
+    await setDoc(doc(db, 'users', user.uid), {
+      email: user.email
+    }, { merge: true })
+
+    router.push('/')
+  } catch (err) {
+    error.value = 'Login failed: ' + err.message
+  }
 }
-
 </script>
 
 

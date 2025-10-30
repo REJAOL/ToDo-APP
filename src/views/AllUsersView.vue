@@ -12,47 +12,40 @@
       </div>
     </div>
     <div v-if="userTaskGroups.length === 0" class="text-center text-muted py-5">
-      <p>No tasks from any user yet.</p>
+      <p>No users found.</p>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { collectionGroup, query } from 'firebase/firestore'
+import { collectionGroup, query, collection, getDocs } from 'firebase/firestore'
 import { useCollection } from 'vuefire'
 import { db, auth } from '../firebase'
-import { onAuthStateChanged, listUsers } from 'firebase/auth' // নতুন
+import { onAuthStateChanged } from 'firebase/auth'
 import UserCard from '../components/UserCard.vue'
 import Navbar from '../components/Navbar.vue'
 
 const currentUserEmail = ref('')
-const allTasks = ref([])
-const registeredUsers = ref([]) // নতুন
+const registeredEmails = ref([])
 
-// সব টাস্ক
+// সব টাস্ক (collectionGroup)
 const tasksQuery = query(collectionGroup(db, 'tasks'))
 const tasksData = useCollection(tasksQuery)
 
-onMounted(() => {
+onMounted(async () => {
   onAuthStateChanged(auth, async (user) => {
     if (user) {
       currentUserEmail.value = user.email
 
-      // Firebase Auth থেকে সব ইউজার নিয়ে আসো
+      // Firestore থেকে সব ইউজারের email নিয়ে আসো
       try {
-        const response = await fetch(
-          `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${import.meta.env.VITE_FIREBASE_API_KEY}`,
-          {
-            method: 'POST',
-            body: JSON.stringify({}),
-            headers: { 'Content-Type': 'application/json' }
-          }
-        )
-        const data = await response.json()
-        registeredUsers.value = data.users?.map(u => u.email) || []
+        const usersSnap = await getDocs(collection(db, 'users'))
+        registeredEmails.value = usersSnap.docs
+          .map(doc => doc.data().email)
+          .filter(email => email) // null বাদ
       } catch (error) {
-        console.error("Failed to fetch users:", error)
+        console.error("Failed to load users:", error)
       }
     }
   })
@@ -62,7 +55,7 @@ onMounted(() => {
 const userTaskGroups = computed(() => {
   const groups = {}
 
-  // টাস্ক থেকে
+  // টাস্ক থেকে গ্রুপ
   tasksData.value.forEach(task => {
     const email = task.createdBy || 'Unknown'
     if (!groups[email]) groups[email] = { email, tasks: [] }
@@ -70,7 +63,7 @@ const userTaskGroups = computed(() => {
   })
 
   // সব রেজিস্টার্ড ইউজার যোগ করো
-  registeredUsers.value.forEach(email => {
+  registeredEmails.value.forEach(email => {
     if (!groups[email]) {
       groups[email] = { email, tasks: [] }
     }

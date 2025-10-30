@@ -51,6 +51,9 @@ const completedCount = computed(() => tasks.value.filter(t => t.completed).lengt
 // === 4. Functions ===
 
 // addTask() ফাংশন
+import { collection, addDoc } from 'firebase/firestore'
+import { db, auth } from '../firebase'
+
 async function addTask() {
   const text = newTaskText.value.trim()
   if (text && auth.currentUser) {
@@ -58,9 +61,9 @@ async function addTask() {
       text,
       completed: false,
       isEditing: false,
-      dueDate: newDueDate.value,
-      remind: newRemind.value,
-      createdBy: auth.currentUser.email 
+      dueDate: newDueDate.value || null,
+      remind: newRemind.value || false,
+      createdBy: auth.currentUser.email  // এটা থাকতেই হবে
     })
     newTaskText.value = ''
     newDueDate.value = ''
