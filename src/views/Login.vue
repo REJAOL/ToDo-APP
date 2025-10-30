@@ -12,11 +12,6 @@ const isLogin = ref(true)
 const router = useRouter()
 
 async function handleAuth() {
-
-    console.log('Email:', email.value)
-  console.log('Password:', password.value)
-  console.log('Is Login:', isLogin.value)
-
   error.value = ''
   try {
     let user
@@ -29,17 +24,29 @@ async function handleAuth() {
       user = cred.user
     }
 
-    // users/{uid} তৈরি/আপডেট
+    // 👇 এখানে ডিবাগ লগ যোগ করো
+    console.log('✅ User created:', user.uid)
+    console.log('📧 Email:', user.email)
+    console.log('⏳ Saving to Firestore...')
+
+    // 👇 এখানে একটু ডিলে দাও (debugging-এর জন্য)
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
+    // 👇 Firestore-এ সেভ করার আগে আবার চেক করো
+    if (!user || !user.uid) {
+      throw new Error('User not found after registration')
+    }
+
     await setDoc(doc(db, 'users', user.uid), {
       email: user.email
     }, { merge: true })
 
-    console.log('Saved user:', user.email)  // ডিবাগ
+    console.log('✅ Saved user to Firestore:', user.email)
 
     router.push('/')
   } catch (err) {
     error.value = err.message
-    console.error('Auth error:', err)
+    console.error('❌ Full error:', err)  // 👈 এখানে সম্পূর্ণ এরর দেখো!
   }
 }
 </script>
