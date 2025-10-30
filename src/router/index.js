@@ -10,9 +10,13 @@ const auth = getAuth(app)  // <-- নতুন করে তৈরি করো
 const routes = [
   { path: '/',
     name:'AllUsers',
-    component : ()=> import('../views/AllUsersView.vue')
+    component : ()=> import('../views/AllUsersView.vue'),
+    meta:{requiresAuth:true}
    },
-  { path: '/login', component: Login },
+  { path: '/login', 
+    name:'Login',
+    component: ()=>import('../views/Login.vue') 
+  },
   { path: '/home', 
     name: Home, 
     component:()=>import('../views/Home.vue'),
@@ -32,7 +36,7 @@ router.beforeEach((to, from, next) => {
     if (requiresAuth && !user) {
       next('/login')
     } else if (to.path === '/login' && user) {
-      next('/home')
+      next('/')
     } else {
       next()
     }
