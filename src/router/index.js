@@ -1,6 +1,6 @@
-// src/router/index.js
+// src/router/index.js — ফুল কোড
 import { createRouter, createWebHistory } from 'vue-router'
-import { getAuth } from 'firebase/auth'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { app } from '../firebase'
 
 const auth = getAuth(app)
@@ -31,19 +31,19 @@ const router = createRouter({
   routes
 })
 
+// Auth Guard
 router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some(r => r.meta.requiresAuth)
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
   
-  const unsubscribe = auth.onAuthStateChanged(user => {
-    unsubscribe()
+  onAuthStateChanged(auth, (user) => {
     if (requiresAuth && !user) {
       next('/login')
     } else if (to.path === '/login' && user) {
-      next('/') 
+      next('/')
     } else {
       next()
     }
   })
 })
 
-export default router
+export default router 

@@ -17,21 +17,19 @@ async function handleAuth() {
     let user
 
     if (isLogin.value) {
-      // লগইন
       const cred = await signInWithEmailAndPassword(auth, email.value, password.value)
       user = cred.user
     } else {
-      // রেজিস্টার
       const cred = await createUserWithEmailAndPassword(auth, email.value, password.value)
       user = cred.user
     }
 
-    // এই লাইনটা চলতেই হবে
+    // users/{uid} তৈরি/আপডেট
     await setDoc(doc(db, 'users', user.uid), {
       email: user.email
     }, { merge: true })
 
-    console.log('Saved to Firestore:', user.email, user.uid) // ডিবাগ
+    console.log('Saved user:', user.email)  // ডিবাগ
 
     router.push('/')
   } catch (err) {
