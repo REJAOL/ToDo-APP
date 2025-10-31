@@ -1,9 +1,9 @@
-
-import { initializeApp } from "firebase/app";
+// firebase.js
+import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-
+// ✅ Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyB9iT0JXFOwG38uTjY8dYDa527dujrFjBs",
   authDomain: "my-todo-app-69bbe.firebaseapp.com",
@@ -13,8 +13,11 @@ const firebaseConfig = {
   appId: "1:844616107737:web:b7f37df2b1aecbd240a0c8"
 };
 
-const app = initializeApp(firebaseConfig)
-const db = getFirestore(app)
-const auth = getAuth(app)
+// ✅ prevent duplicate initialization (Vite reload e often duplicate hoy)
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-export {app, db, auth}
+// ✅ Firestore and Auth instances
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+export { app, db, auth };
