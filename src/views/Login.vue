@@ -12,27 +12,27 @@ const router = useRouter()
 
 async function register() {
   try {
-    // 1️⃣ User create in Firebase Auth
     const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value)
     const user = userCredential.user
 
-    // 2️⃣ Wait a bit (optional, to ensure auth context)
+    // Ensure auth context is ready
     await new Promise(resolve => setTimeout(resolve, 500))
 
-    // 3️⃣ Create Firestore document under "users" collection
+    // ✅ Create user document in Firestore
     await setDoc(doc(db, 'users', user.uid), {
       email: user.email,
       createdAt: new Date().toISOString(),
-      tasks: [] // optional, jodi future e tasks array use korte chao
+      tasks: []
     })
 
-    console.log('✅ User document saved:', user.email)
+    console.log('✅ Firestore doc created for:', user.email)
     router.push('/')
   } catch (err) {
-    console.error('❌ Error:', err.code, err.message)
+    console.error('❌ Firebase Error:', err)
     error.value = err.message
   }
 }
+
 </script>
 
 <template>
