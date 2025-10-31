@@ -3,7 +3,6 @@ import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// ✅ Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyB9iT0JXFOwG38uTjY8dYDa527dujrFjBs",
   authDomain: "my-todo-app-69bbe.firebaseapp.com",

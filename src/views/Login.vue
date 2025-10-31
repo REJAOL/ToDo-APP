@@ -12,19 +12,18 @@ const router = useRouter()
 
 async function register() {
   try {
-    // 🔹 Step 1: Create user in Firebase Auth
+    // 🔹 1. Create user in Firebase Auth
     const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value)
     const user = userCredential.user
-
     console.log('✅ Auth user created:', user.email)
 
-    // 🔹 Step 2: Wait for Firebase Auth to confirm the user session (token ready)
+    // 🔹 2. Ensure Auth state ready
     await new Promise((resolve) => {
       const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
         if (currentUser) {
           console.log('👤 Auth state confirmed:', currentUser.email)
 
-          // 🔹 Step 3: Create user document in Firestore
+          // 🔹 3. Create Firestore user doc
           await setDoc(doc(db, 'users', currentUser.uid), {
             email: currentUser.email,
             createdAt: serverTimestamp(),
@@ -32,7 +31,6 @@ async function register() {
           })
 
           console.log('✅ Firestore doc created for:', currentUser.email)
-
           unsubscribe() // stop listener
           resolve()
           router.push('/')
@@ -47,11 +45,11 @@ async function register() {
 </script>
 
 <template>
-  <div>
+  <div class="container mt-5">
     <h2>Register</h2>
-    <p v-if="error" style="color: red">{{ error }}</p>
-    <input v-model="email" placeholder="Email" />
-    <input v-model="password" type="password" placeholder="Password (6+ chars)" />
-    <button @click="register">Register</button>
+    <p v-if="error" class="text-danger">{{ error }}</p>
+    <input v-model="email" placeholder="Email" class="form-control mb-2" />
+    <input v-model="password" type="password" placeholder="Password (6+ chars)" class="form-control mb-2" />
+    <button @click="register" class="btn btn-primary w-100">Register</button>
   </div>
 </template>
