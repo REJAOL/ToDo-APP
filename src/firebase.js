@@ -13,11 +13,8 @@ const firebaseConfig = {
   appId: "1:844616107737:web:b7f37df2b1aecbd240a0c8"
 };
 
-// ✅ prevent duplicate initialization (Vite reload e often duplicate hoy)
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-
-// ✅ Firestore and Auth instances
-const db = getFirestore(app);
-const auth = getAuth(app);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 export { app, db, auth };
